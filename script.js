@@ -1,158 +1,168 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const calculatorScreen = document.getElementById('calculatorScreen');
-    const calculatorKeys = document.querySelector('.calculator-keys');
-
+    const display = document.getElementById('display');
     let currentInput = '';
-    let operator = null;
-    let previousValue = '';
-    let waitingForSecondOperand = false;
+    let result = '';
+    let hasDecimal = false;
 
-    // Function to evaluate the expression safely
-    function evaluateExpression(expression) {
-        try {
-            // Replace x^2 and x^3 with Math.pow for evaluation
-            expression = expression.replace(/(\d+(\.\d+)?)\^2/g, 'Math.pow($1, 2)');
-            expression = expression.replace(/(\d+(\.\d+)?)\^3/g, 'Math.pow($1, 3)');
-            // Replace sqrt with Math.sqrt
-            expression = expression.replace(/sqrt\((\d+(\.\d+)?)\)/g, 'Math.sqrt($1)');
+    // Function to update the display
+    function updateDisplay(value) {
+        display.value = value;
+    }
 
-            // Basic validation for common issues (e.g., consecutive operators)
-            if (/[+\-*/.]{2,}/.test(expression)) {
-                return 'Error';
+    // Function to handle number and decimal input
+    function handleNumber(num) {
+        if (currentInput === 'Error') {
+            currentInput = '';
+        }
+        if (num === '.' && hasDecimal) {
+            return; // Prevent multiple decimals
+        }
+        if (num === '.') {
+            hasDecimal = true;
+            if (currentInput === '' || isOperator(currentInput.slice(-1)) || currentInput.slice(-1) === '(') {
+                currentInput += '0.'; // Add leading zero for .
+            } else {
+                currentInput += num;
             }
+        } else {
+            currentInput += num;
+        }
+        updateDisplay(currentInput);
+    }
 
-            // Use Function constructor for safe evaluation
-            const result = new Function('return ' + expression)();
-            return String(result);
+    // Function to handle operators
+    function handleOperator(op) {
+        if (currentInput === 'Error') {
+            currentInput = '';
+        }
+        if (currentInput === '' && op !== '(') return; // Don't start with an operator unless it's an open parenthesis
+
+        const lastChar = currentInput.slice(-1);
+        if (isOperator(lastChar) && lastChar !== '(' && lastChar !== ')') {
+            // Replace last operator if a new one is entered (e.g., 5++ becomes 5+)
+            currentInput = currentInput.slice(0, -1) + op;
+        } else if (lastChar === '(' && op !== '(') {
+            // Allow numbers/operators after an open parenthesis
+            currentInput += op;
+        } else {
+            currentInput += op;
+        }
+        hasDecimal = false; // Reset decimal flag after an operator
+        updateDisplay(currentInput);
+    }
+
+    // Function to check if a character is an operator
+    function isOperator(char) {
+        return ['+', '-', '*', '/', '×', '÷', '^'].includes(char);
+    }
+
+    // Function to handle special operations (power, sqrt)
+    function handleSpecialOperation(action) {
+        if (currentInput === 'Error') {
+            currentInput = '';
+        }
+        if (currentInput === '') return;
+
+        try {
+            // Evaluate the current input to get the number
+            let num = eval(currentInput.replace(/×/g, '*').replace(/÷/g, '/').replace(/\^/g, '**'));
+            if (isNaN(num)) {
+                 throw new Error("Invalid input for operation");
+            }
+            if (action === 'power2') {
+                result = Math.pow(num, 2);
+            } else if (action === 'power3') {
+                result = Math.pow(num, 3);
+            } else if (action === 'sqrt') {
+                if (num < 0) {
+                    throw new Error("Cannot take square root of a negative number");
+                }
+                result = Math.sqrt(num);
+            }
+            currentInput = result.toString();
+            updateDisplay(currentInput);
+            hasDecimal = currentInput.includes('.');
         } catch (error) {
-            return 'Error';
+            currentInput = 'Error';
+            updateDisplay('Error');
+            console.error("Calculation Error:", error.message);
         }
     }
 
-    calculatorKeys.addEventListener('click', (event) => {
-        const { target } = event;
-        const { value } = target;
-
-        if (!target.matches('button')) {
+    // Function to handle calculation
+    function calculate() {
+        if (currentInput === '') return;
+        if (currentInput === 'Error') {
+            currentInput = '';
             return;
         }
 
-        if (target.classList.contains('operator')) {
-            handleOperator(value);
-            return;
-        }
+        try {
+            // Replace custom operators with standard JS operators
+            let expression = currentInput.replace(/×/g, '*').replace(/÷/g, '/');
 
-        if (target.classList.contains('decimal')) {
-            inputDecimal(value);
-            return;
-        }
+            // Handle power operations (x^y)
+            expression = expression.replace(/(\d+(\.\d+)?)\^(\d+(\.\d+)?)/g, 'Math.pow($1, $3)');
 
-        if (target.classList.contains('all-clear')) {
-            resetCalculator();
-            return;
-        }
+            result = eval(expression);
 
-        inputDigit(value);
+            if (isNaN(result) || !isFinite(result)) {
+                throw new Error("Invalid calculation or division by zero");
+            }
+            currentInput = result.toString();
+            updateDisplay(currentInput);
+            hasDecimal = currentInput.includes('.');
+        } catch (error) {
+            currentInput = 'Error';
+            updateDisplay('Error');
+            console.error("Calculation Error:", error.message);
+        }
+    }
+
+    // Event listener for all buttons
+    document.querySelectorAll('.btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const buttonText = button.textContent;
+            const action = button.dataset.action;
+
+            if (button.classList.contains('number') || button.classList.contains('decimal')) {
+                handleNumber(buttonText);
+            } else if (button.classList.contains('operator')) {
+                if (action === 'clear') {
+                    currentInput = '';
+                    result = '';
+                    hasDecimal = false;
+                    updateDisplay('0');
+                } else if (action === 'backspace') {
+                    currentInput = currentInput.slice(0, -1);
+                    if (currentInput === '') {
+                        updateDisplay('0');
+                    } else {
+                        updateDisplay(currentInput);
+                    }
+                    hasDecimal = currentInput.includes('.'); // Re-check decimal after backspace
+                } else if (action === 'power2' || action === 'power3' || action === 'sqrt') {
+                    handleSpecialOperation(action);
+                } else if (action === 'calculate') {
+                    calculate();
+                } else if (action === 'open-paren') {
+                    if (currentInput !== '' && !isOperator(currentInput.slice(-1)) && currentInput.slice(-1) !== '(') {
+                        // If there's a number before '(', insert '*' for implicit multiplication
+                        currentInput += '*(';
+                    } else {
+                        currentInput += '(';
+                    }
+                    updateDisplay(currentInput);
+                } else if (action === 'close-paren') {
+                    currentInput += ')';
+                    updateDisplay(currentInput);
+                } else {
+                    handleOperator(buttonText);
+                }
+            }
+        });
     });
 
-    function inputDigit(digit) {
-        if (waitingForSecondOperand === true) {
-            currentInput = digit;
-            waitingForSecondOperand = false;
-        } else {
-            currentInput = currentInput === '0' ? digit : currentInput + digit;
-        }
-        updateScreen();
-    }
-
-    function inputDecimal(dot) {
-        if (waitingForSecondOperand === true) {
-            currentInput = '0.';
-            waitingForSecondOperand = false;
-            updateScreen();
-            return;
-        }
-
-        if (!currentInput.includes(dot)) {
-            currentInput += dot;
-        }
-        updateScreen();
-    }
-
-    function handleOperator(nextOperator) {
-        if (nextOperator === 'AC') {
-            resetCalculator();
-            return;
-        }
-
-        if (nextOperator === '(' || nextOperator === ')') {
-            currentInput += nextOperator;
-            updateScreen();
-            return;
-        }
-
-        if (nextOperator === 'x^2') {
-            if (currentInput !== '') {
-                // To handle x^2 in the middle of an expression, we need a more robust parser
-                // For simplicity, this will apply to the current number or the result
-                currentInput = `(${currentInput})^2`;
-                updateScreen();
-            }
-            return;
-        }
-
-        if (nextOperator === 'x^3') {
-            if (currentInput !== '') {
-                currentInput = `(${currentInput})^3`;
-                updateScreen();
-            }
-            return;
-        }
-
-        if (nextOperator === 'sqrt') {
-            if (currentInput !== '') {
-                currentInput = `sqrt(${currentInput})`;
-                updateScreen();
-            }
-            return;
-        }
-        
-        if (nextOperator === '=') {
-            if (currentInput === '') {
-                return;
-            }
-            const result = evaluateExpression(currentInput);
-            calculatorScreen.value = result;
-            currentInput = result === 'Error' ? '' : result; // Clear if error
-            waitingForSecondOperand = true;
-            return;
-        }
-        
-        // For standard operators (+, -, *, /)
-        if (currentInput === '' && nextOperator !== '-') { // Allow leading minus sign
-            return;
-        }
-
-        // Prevent adding operator immediately after another operator (unless it's a negative sign)
-        if (currentInput.slice(-1).match(/[+\-*/]/) && !['+', '-', '*', '/'].includes(nextOperator)) {
-            currentInput += nextOperator;
-        } else if (!currentInput.slice(-1).match(/[+\-*/]/) || nextOperator === '-') {
-            currentInput += nextOperator;
-        }
-        
-        waitingForSecondOperand = false;
-        updateScreen();
-    }
-
-    function updateScreen() {
-        calculatorScreen.value = currentInput;
-    }
-
-    function resetCalculator() {
-        currentInput = '';
-        operator = null;
-        previousValue = '';
-        waitingForSecondOperand = false;
-        calculatorScreen.value = '';
-    }
+    // Initialize display
+    updateDisplay('0');
 });

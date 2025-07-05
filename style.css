@@ -1,87 +1,104 @@
 body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #e0f2f7; /* Light blue background */
+    font-family: 'Arial', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    background-color: #e0f2f7; /* Light blue background */
+    margin: 0;
 }
 
 .calculator {
-    border: 1px solid #03a9f4; /* Blue border */
-    border-radius: 10px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 25px;
     width: 320px;
-    background-color: #ffffff; /* White calculator background */
-    padding: 20px;
+    border: 1px solid #a7d9ed; /* Slightly darker blue border */
 }
 
-.calculator-screen {
+.calculator-display {
     width: calc(100% - 20px);
-    height: 60px;
-    background-color: #e3f2fd; /* Lighter blue for screen */
-    border: none;
-    border-radius: 5px;
-    margin-bottom: 20px;
+    background-color: #ecf8ff; /* Very light blue for display */
+    border: 1px solid #b3e0ff;
+    border-radius: 8px;
+    padding: 15px 10px;
     font-size: 2.5em;
     text-align: right;
-    padding: 0 10px;
-    color: #2196f3; /* Darker blue text */
-    box-sizing: border-box;
+    margin-bottom: 20px;
+    color: #004d7f; /* Dark blue text */
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box; /* Include padding in width */
 }
 
-.calculator-keys {
+.calculator-buttons {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    grid-gap: 10px;
+    gap: 12px;
 }
 
-.calculator-keys button {
-    height: 60px;
-    background-color: #bbdefb; /* Light blue buttons */
+.btn {
+    background-color: #cceeff; /* Light blue for buttons */
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
+    padding: 20px 0;
     font-size: 1.5em;
-    color: #2196f3; /* Darker blue text */
+    color: #004d7f; /* Dark blue text */
     cursor: pointer;
-    outline: none;
-    transition: background-color 0.2s, transform 0.1s;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.calculator-keys button:hover {
-    background-color: #90caf9; /* Slightly darker blue on hover */
+.btn:hover {
+    background-color: #aaddff; /* Slightly darker blue on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-.calculator-keys button:active {
-    transform: scale(0.98);
+.btn:active {
+    background-color: #88ccff; /* Even darker blue on active */
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.operator {
-    background-color: #64b5f6; /* Medium blue for operators */
-    color: #ffffff; /* White text for operators */
+.btn.operator {
+    background-color: #99ddff; /* Medium blue for operators */
+    color: #003366;
 }
 
-.operator:hover {
-    background-color: #42a5f5; /* Darker blue for operators on hover */
+.btn.operator:hover {
+    background-color: #77ccff;
 }
 
-.all-clear {
-    background-color: #ef5350; /* Red for clear button */
+.btn.operator.clear {
+    background-color: #ff9999; /* Red for clear button */
+    color: #660000;
+}
+
+.btn.operator.clear:hover {
+    background-color: #ff6666;
+}
+
+.btn.operator.equal {
+    background-color: #33bbff; /* Bright blue for equals button */
     color: #ffffff;
-    grid-column: span 2; /* Make AC button span 2 columns */
+    grid-column: span 2; /* Span two columns for equals button */
 }
 
-.all-clear:hover {
-    background-color: #e53935; /* Darker red for clear on hover */
+.btn.operator.equal:hover {
+    background-color: #0099e6;
 }
 
-.equal-sign {
-    background-color: #2196f3; /* Main blue for equal sign */
-    color: #ffffff;
-    grid-column: span 2; /* Make equal sign span 2 columns */
+.btn.number.zero {
+    grid-column: span 2; /* Span two columns for zero button */
 }
 
-.equal-sign:hover {
-    background-color: #1976d2; /* Darker blue for equal on hover */
+/* Specific styling for parenthesis to make them distinct */
+.btn.parenthesis {
+    background-color: #b3e0ff; /* A slightly lighter blue for parenthesis */
+    color: #004d7f;
+}
+
+.btn.parenthesis:hover {
+    background-color: #99d6ff;
 }
