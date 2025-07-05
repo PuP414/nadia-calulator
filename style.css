@@ -1,0 +1,87 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #e0f2f7; /* Light blue background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.calculator {
+    border: 1px solid #03a9f4; /* Blue border */
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    width: 320px;
+    background-color: #ffffff; /* White calculator background */
+    padding: 20px;
+}
+
+.calculator-screen {
+    width: calc(100% - 20px);
+    height: 60px;
+    background-color: #e3f2fd; /* Lighter blue for screen */
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 2.5em;
+    text-align: right;
+    padding: 0 10px;
+    color: #2196f3; /* Darker blue text */
+    box-sizing: border-box;
+}
+
+.calculator-keys {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 10px;
+}
+
+.calculator-keys button {
+    height: 60px;
+    background-color: #bbdefb; /* Light blue buttons */
+    border: none;
+    border-radius: 5px;
+    font-size: 1.5em;
+    color: #2196f3; /* Darker blue text */
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.calculator-keys button:hover {
+    background-color: #90caf9; /* Slightly darker blue on hover */
+}
+
+.calculator-keys button:active {
+    transform: scale(0.98);
+}
+
+.operator {
+    background-color: #64b5f6; /* Medium blue for operators */
+    color: #ffffff; /* White text for operators */
+}
+
+.operator:hover {
+    background-color: #42a5f5; /* Darker blue for operators on hover */
+}
+
+.all-clear {
+    background-color: #ef5350; /* Red for clear button */
+    color: #ffffff;
+    grid-column: span 2; /* Make AC button span 2 columns */
+}
+
+.all-clear:hover {
+    background-color: #e53935; /* Darker red for clear on hover */
+}
+
+.equal-sign {
+    background-color: #2196f3; /* Main blue for equal sign */
+    color: #ffffff;
+    grid-column: span 2; /* Make equal sign span 2 columns */
+}
+
+.equal-sign:hover {
+    background-color: #1976d2; /* Darker blue for equal on hover */
+}
